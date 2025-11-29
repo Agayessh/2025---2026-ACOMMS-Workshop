@@ -2,27 +2,73 @@ const taskForm = document.getElementById("task-form");
 const taskInput = document.getElementById("task-input");
 const taskList = document.getElementById("task-list");
 
+// Display tasks
+function displayTasks(tasks) {
+    taskList.innerHTML = "";
 
-function displayTasks(tasks)
-    {
-        taskList.innerHTML = "";
+    tasks.forEach(task => {
+        const li = document.createElement('li');
+        li.className = "task-item";
 
-        taskForm.onbeforematch(tsk => {
-            const li = document.createElement('li');
-            li.className = "task-item";
+        const taskText = document.createElement('span');
+        taskText.className = 'task-text';
+        taskText.textContent = task.text; // FIXED
 
-            const taskText = document.createElement('span')
-            taskText.className = 'task-text';
-            taskText.textContent = task.test;
+        const deleteBtn = document.createElement('button');
+        deleteBtn.className = 'delete-btn'; // FIXED
+        deleteBtn.textContent = "Delete";
+        deleteBtn.onclick = () => deleteTask(task.id); // FIXED
 
-            const deleteBtn = document.createElement('button');
-            deleteBtn.classname = 'delete-btn';
-            deleteBtn.textContent = "Delete";
-            deleteBtn.onclick = () => console.log("deleted");
-        });
-    }
+        li.appendChild(taskText);
+        li.appendChild(deleteBtn);
+        taskList.appendChild(li);
 
-asnyc function fetchTasks()
-{
-    
+        li.appendChild(taskText);
+        li.appendChild(deleteBtn);
+        taskList.appendChild(li);
+    });
 }
+
+// GET 
+async function fetchTasks() {
+    const response = await fetch('/tasks');
+    const tasks = await response.json(); // FIXED
+    displayTasks(tasks);
+}
+
+// POST
+async function addTask(text) {
+    await fetch('/tasks', {
+        method: 'POST',
+        headers: {
+            "Content-Type": "application/json", // FIXED
+        },
+        body: JSON.stringify({ text }),
+    });
+
+    fetchTasks(); // Refresh list
+}
+
+// DELETE
+async function deleteTask(id) {
+    await fetch(`/tasks/${id}`, {
+        method: "DELETE",
+    });
+
+    fetchTasks(); // Refresh list
+}
+
+// Form submit event
+taskForm.addEventListener("submit", async (e) => { // <-- added async
+    e.preventDefault();
+
+    const text = taskInput.value.trim();
+    if (text) {
+        await addTask(text);
+        taskInput.value = "";
+       
+    }
+});
+
+
+fetchTasks();

@@ -4,6 +4,8 @@ const PORT = 3000;
 
 app.use(express.json());
 
+app.usd(express.static("../frontend"));
+
 let tasks = [];
 let nextId = 1;
 
